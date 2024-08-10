@@ -5,18 +5,46 @@ const apiUrl = "http://localhost:3000/api/v2/employee";
 export const fetchEmployees = createAsyncThunk(
   "employee/fetchEmployee",
   async () => {
-    const response = await axios.get(apiUrl);
-    return response.data;
+    try {
+      const response = await axios.get(apiUrl);
+      return response.data;
+    } catch (error) {
+      return console.error("Error in fetchEmployees: ", error.message);
+    }
   }
 );
 export const addEmployee = createAsyncThunk(
   "employee/addEmployee",
-  async (employee, { rejectWithValue }) => {
+  async (employee) => {
     try {
       const response = await axios.post(`${apiUrl}/`, employee);
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data || error.message);
+      return console.error("Error in addEmployee: ", error.message);
+    }
+  }
+);
+
+export const addSalary = createAsyncThunk(
+  "employee/addSalary",
+  async ({ id, salary }) => {
+    try {
+      const response = await axios.post(`${apiUrl}/${id}/salary`, salary);
+      return response.data;
+    } catch (error) {
+      return console.error("Error in addSalary: ", error.message);
+    }
+  }
+);
+
+export const addAttendance = createAsyncThunk(
+  "employee/addAttendance",
+  async ({ id, attendance }) => {
+    try {
+      const response = await axios.post(`${apiUrl}/${id}/presenty`, attendance);
+      return response.data;
+    } catch (error) {
+      return console.error("Error in addAttendance: ", error.message);
     }
   }
 );
@@ -44,9 +72,24 @@ const employeeSlice = createSlice({
         state.status = "failed";
         state.error = action.error.message;
       })
-
       .addCase(addEmployee.fulfilled, (state, action) => {
         state.employees.push(action.payload);
+      })
+      .addCase(addSalary.fulfilled, (state, action) => {
+        const employee = state.employees.find(
+          (emp) => emp.id === action.payload.id
+        );
+        if (employee) {
+          employee.salary.push(action.payload.salary);
+        }
+      })
+      .addCase(addAttendance.fulfilled, (state, action) => {
+        const employee = state.employees.find(
+          (emp) => emp.id === action.payload.id
+        );
+        if (employee) {
+          employee.presenty.push(action.payload.attendance);
+        }
       });
   },
 });

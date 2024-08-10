@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { addEmployee } from "../../features/employees/employeeSlice";
+import { addEmployee, fetchEmployees } from "../../features/employees/employeeSlice";
 
 function AddEmployee() {
   const [name, setName] = useState("");
@@ -36,6 +36,7 @@ function AddEmployee() {
         },
       };
       dispatch(addEmployee(newEmployee));
+      dispatch(fetchEmployees())
       navigate("/");
     } catch (error) {
       console.error("error in handleSubmit :", error);

@@ -18,7 +18,7 @@ const EmployeeList = () => {
   return (
     <>
       <div className="flex flex-1 flex-col items-center overflow-x-hidden  w-full bg-gray-950 h-screen">
-        <h1 className="text-white font-semibold mt-2 text-xl">Employees</h1>
+        <h1 className="text-white font-semibold mt-2 text-3xl">Employees</h1>
         {status === "loading" && <p>Loading...</p>}
         {status === "failed" && <p>{error}</p>}
         {status === "succeeded" && (

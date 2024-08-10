@@ -96,7 +96,7 @@ const addPresenty = async (req, res) => {
   const { id } = req.params;
   const { date, present } = req.body;
 
-  if (!date || !present) {
+  if (!date || typeof present !== "boolean") {
     return res
       .status(400)
       .send({ error: "Presenty status and date are required" });
