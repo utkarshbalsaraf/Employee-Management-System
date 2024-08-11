@@ -6,8 +6,8 @@ import { Link } from "react-router-dom";
 const EmployeeList = () => {
   const dispatch = useDispatch();
   const employees = useSelector((state) => state.employees.employees);
-  const status = useSelector((state) => state.employees.status);
   const error = useSelector((state) => state.employees.error);
+  const status = useSelector((state) => state.employees.status);
 
   useEffect(() => {
     if (status === "idle") {

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   addAttendance,
@@ -8,19 +8,22 @@ import { useParams } from "react-router-dom";
 
 function AttendancePage() {
   const { id } = useParams();
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(fetchEmployees());
+  }, [dispatch]);
   const employee = useSelector((state) =>
     state.employees.employees.find((emp) => emp._id === id)
   );
   const [present, setPresent] = useState(false);
   const [date, setDate] = useState("");
-  const dispatch = useDispatch();
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const newAttendance = {
       date,
       present,
     };
-
     dispatch(addAttendance({ id, attendance: newAttendance }));
     setDate("");
     setPresent(false);
@@ -28,7 +31,11 @@ function AttendancePage() {
   };
 
   if (!employee) {
-    return <div className="text-white">Employee not Found</div>;
+    return (
+      <div className=" flex justify-center items-center text-5xl w-full h-full text-white ">
+        Employee not found
+      </div>
+    );
   }
 
   return (
@@ -75,21 +82,24 @@ function AttendancePage() {
         </form>
       </div>
       <div className="flex flex-col items-center">
-        <h1 className="text-white text-3xl font-semibold my-1 ">
+        <h1 className="text-white text-3xl font-semibold border py-2 px-3 rounded-lg my-1 ">
           Attendance History
         </h1>
         <ul className="flex flex-col items-center text-white w-screen">
           <li className=" m-1 w-2/4 ">
-            <div className="flex justify-around">
-              <span className="flex font-semibold text-lg items-center justify-center w-1/2 ">
+            <div className="flex justify-between">
+              <span className="flex font-semibold text-xl items-center justify-center w-2/5 ">
                 Date
               </span>
-              <span className="flex font-semibold text-lg items-center justify-center w-1/2">
+              <span className="flex font-semibold text-xl items-center justify-center w-2/5">
                 Present
+              </span>
+              <span className="flex font-semibold text-xl items-center justify-center w-1/5">
+                Delete
               </span>
             </div>
           </li>
-          {employee.presenty.map((att, index) => {
+          {employee.presenty.map((att) => {
             const datestring = att.date;
             const attDate = new Date(datestring);
             const formattedDate = attDate.toLocaleDateString("en-GB", {
@@ -98,13 +108,21 @@ function AttendancePage() {
               year: "numeric",
             });
             return (
-              <li className="w-2/4 " key={index}>
-                <div className="flex p-2 cursor-pointer hover:bg-gray-800 border my-1 rounded-lg bg-gray-900 justify-around">
-                  <span className="flex items-center justify-center w-1/2">
+              <li className="w-2/4 " key={att._id}>
+                <div className="flex p-2 cursor-pointer hover:bg-gray-800 border my-1 rounded-lg bg-gray-900 justify-between">
+                  <span className="flex items-center justify-center text-lg w-2/5">
                     {formattedDate}
                   </span>
-                  <span className="flex items-center justify-center w-1/2">
+                  <span className="flex items-center justify-center text-lg w-2/5">
                     {att.present ? "Yes" : "No"}
+                  </span>
+                  <span className="flex items-center justify-center w-1/5">
+                    <button
+                      className="m-0.5 bg-red-500 font-semibold text-lg hover:bg-red-600 active:bg-blue-200 text-white shadow-md shadow-black px-3 py-1 rounded-lg"
+                      onClick={() => handleDelete(sal._id)}
+                    >
+                      Delete
+                    </button>
                   </span>
                 </div>
               </li>

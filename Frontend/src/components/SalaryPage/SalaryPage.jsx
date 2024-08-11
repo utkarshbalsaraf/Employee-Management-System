@@ -1,19 +1,25 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   addSalary,
+  deleteSalary,
   fetchEmployees,
 } from "../../features/employees/employeeSlice";
 
 function SalaryPage() {
   const { id } = useParams();
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(fetchEmployees());
+  }, [dispatch]);
+
   const employee = useSelector((state) =>
     state.employees.employees.find((emp) => emp._id === id)
   );
   const [amount, setAmount] = useState("");
   const [date, setDate] = useState("");
-  const dispatch = useDispatch();
+ 
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -26,8 +32,15 @@ function SalaryPage() {
     setAmount("");
     setDate("");
   };
+  const handleDelete = (salaryId) => {
+    dispatch(deleteSalary({ id: employee._id, salaryId: salaryId }));
+  };
   if (!employee) {
-    return <div>Employee not found</div>;
+    return (
+      <div className=" flex justify-center items-center text-5xl w-full h-full text-white ">
+        Employee not found
+      </div>
+    );
   }
 
   return (
@@ -38,7 +51,7 @@ function SalaryPage() {
             Add Salary
           </h1>
           <form onSubmit={handleSubmit} className="w-2/3">
-            <div className="flex gap-5">
+            <div className="flex sm:flex-col gap-5">
               <div className="flex flex-col my-3">
                 <label
                   className="text-white text-lg ms-1 mb-1"
@@ -80,21 +93,24 @@ function SalaryPage() {
           </form>
         </div>
         <div className="flex flex-col items-center">
-          <h1 className="text-white text-3xl font-semibold my-1 ">
+          <h1 className="text-white text-3xl font-semibold border py-2 px-3 rounded-lg my-1 ">
             Salary History
           </h1>
-          <ul className="flex flex-col items-center text-white w-screen">
-            <li className=" m-1 w-2/3 ">
+          <ul className="flex mt-3 flex-col items-center text-white w-screen">
+            <li className=" m-1 w-1/2 ">
               <div className="flex justify-between">
-                <span className="flex font-semibold text-lg items-center justify-center w-1/2 ">
-                  Salary
+                <span className="flex font-semibold text-xl items-center justify-center w-2/5">
+                  Salary(₹)
                 </span>
-                <span className="flex font-semibold text-lg items-center justify-center w-1/2">
+                <span className="flex font-semibold text-xl items-center justify-center w-2/5">
                   Date
+                </span>
+                <span className="flex font-semibold text-xl items-center justify-center w-1/5">
+                  Delete
                 </span>
               </div>
             </li>
-            {employee.salary.map((sal, index) => {
+            {employee.salary.map((sal) => {
               const datestring = sal.date;
               const salDate = new Date(datestring);
               const formattedDate = salDate.toLocaleDateString("en-GB", {
@@ -103,10 +119,22 @@ function SalaryPage() {
                 year: "numeric",
               });
               return (
-                <li className="w-2/3 " key={index}>
+                <li className="w-1/2 " key={sal._id}>
                   <div className="flex p-2 cursor-pointer hover:bg-gray-800 border my-1 rounded-lg bg-gray-900 justify-between">
-                    <span className="w-2/3  mx-2">{sal.amount}</span>
-                    <span className="w-1/3">{formattedDate}</span>
+                    <span className="flex text-lg items-center justify-center w-2/5  mx-2">
+                      {sal.amount}
+                    </span>
+                    <span className="flex text-lg items-center justify-center w-2/5">
+                      {formattedDate}
+                    </span>
+                    <span className="flex items-center justify-center w-1/5">
+                      <button
+                        className="m-0.5 bg-red-500 font-semibold text-lg hover:bg-red-600 active:bg-blue-200 text-white shadow-md shadow-black px-3 py-1 rounded-lg"
+                        onClick={() => handleDelete(sal._id)}
+                      >
+                        Delete
+                      </button>
+                    </span>
                   </div>
                 </li>
               );

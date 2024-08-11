@@ -92,6 +92,24 @@ const addSalary = async (req, res) => {
   }
 };
 
+const deleteSalary = async (req, res) => {
+  try {
+    const { id, salaryId } = req.params;
+    const employee = await Employee.findById(id);
+
+    if (!employee) {
+      return res.status(404).json({ message: "Employee Not Found" });
+    }
+    employee.salary = employee.salary.filter(
+      (sal) => sal._id.toString() !== salaryId
+    );
+    await employee.save();
+    res.status(200).json(employee);
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
+
 const addPresenty = async (req, res) => {
   const { id } = req.params;
   const { date, present } = req.body;
@@ -117,7 +135,25 @@ const addPresenty = async (req, res) => {
     }
     res.status(200).json(employee);
   } catch (error) {
-    res.status(400).json(error);
+    res.status(500).json(error);
+  }
+};
+
+const deletePresenty = async (req, res) => {
+  try {
+    const { id, presentyId } = req.params;
+    const employee = await Employee.findById(id);
+
+    if (!employee) {
+      return res.status(404).json({ message: "Employee not found" });
+    }
+    employee.presenty = employee.presenty.filter(
+      (pr) => pr._id.toString() !== presentyId
+    );
+    await employee.save();
+    res.status(200).json(employee);
+  } catch (error) {
+    res.status(500).json(error);
   }
 };
 
@@ -128,5 +164,7 @@ module.exports = {
   updateEmployee,
   deleteEmployee,
   addSalary,
+  deleteSalary,
   addPresenty,
+  deletePresenty,
 };

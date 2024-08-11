@@ -1,28 +1,44 @@
-import React from "react";
-import { useSelector } from "react-redux";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
+import { fetchEmployees } from "../../features/employees/employeeSlice";
 
 function EmployeeDetail() {
   const { id } = useParams();
+  const dispatch = useDispatch();
+
   const employee = useSelector((state) =>
     state.employees.employees.find((emp) => emp._id === id)
   );
+  const [formattedDate, setFormattedDate] = useState("");
 
-  const birthdateString = employee.birthdate;
-  const birthdate = new Date(birthdateString);
+  useEffect(() => {
+    if (!employee) {
+      dispatch(fetchEmployees());
+    }
+  }, [employee, dispatch]);
 
-  if (isNaN(birthdate.getTime())) {
-    return <div>Invalid birthdate format: {birthdateString}</div>;
-  }
-
-  const formattedDate = birthdate.toLocaleDateString("en-GB", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-  });
+  useEffect(() => {
+    if (employee) {
+      const birthdateString = employee.birthdate;
+      if (birthdateString) {
+        const birthdate = new Date(birthdateString);
+        const formatted = birthdate.toLocaleDateString("en-GB", {
+          day: "2-digit",
+          month: "long",
+          year: "numeric",
+        });
+        setFormattedDate(formatted);
+      }
+    }
+  }, [employee]);
 
   if (!employee) {
-    return <h1>Employee Not Found</h1>;
+    return (
+      <div className=" flex justify-center items-center text-5xl w-full h-full text-white ">
+        Employee not found
+      </div>
+    );
   }
 
   return (
@@ -87,7 +103,10 @@ function EmployeeDetail() {
             >
               Salary
             </Link>
-            <Link to={`/employee/${employee._id}/attendance`} className=" m-2 bg-yellow-500 font-semibold text-lg hover:bg-yellow-600 active:bg-yellow-200 text-white shadow-md shadow-black px-3 py-1.5 rounded-lg">
+            <Link
+              to={`/employee/${employee._id}/attendance`}
+              className=" m-2 bg-yellow-500 font-semibold text-lg hover:bg-yellow-600 active:bg-yellow-200 text-white shadow-md shadow-black px-3 py-1.5 rounded-lg"
+            >
               Attendance
             </Link>
           </div>
